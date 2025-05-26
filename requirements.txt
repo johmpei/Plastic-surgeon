@@ -1,3 +1,0 @@
-flask
-faiss-cpu
-sentence-transformers
