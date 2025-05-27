@@ -11,7 +11,7 @@ app = Flask(__name__)
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# --- 埋め込み取得関数（OpenAI最新版対応） ---
+# --- 埋め込み取得関数（完全新構文） ---
 def get_embedding(text, model="text-embedding-3-small"):
     try:
         response = client.embeddings.create(
@@ -24,12 +24,12 @@ def get_embedding(text, model="text-embedding-3-small"):
         traceback.print_exc()
         return None
 
-# --- /search エンドポイント ---
+# --- 検索エンドポイント ---
 @app.route("/search")
 def search():
     query = request.args.get("query")
     if not query:
-        return jsonify({"error": "検索クエリ（query）を指定してください"}), 400
+        return jsonify({"error": "検索ワードを指定してください"}), 400
 
     try:
         index = faiss.read_index("faiss_index.idx")
@@ -38,7 +38,7 @@ def search():
 
         q_vector = get_embedding(query)
         if q_vector is None:
-            return jsonify({"error": "OpenAI埋め込みに失敗しました"}), 500
+            return jsonify({"error": "ベクトル化に失敗しました"}), 500
 
         q_vector = np.array([q_vector], dtype=np.float32)
 
@@ -50,12 +50,18 @@ def search():
                 "score": float(D[0][list(I[0]).index(idx)])
             })
 
-        return jsonify({"query": query, "results": results})
+        return jsonify({
+            "query": query,
+            "results": results
+        })
 
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return jsonify({"error": "内部エラー", "detail": str(e)}), 500
+        return jsonify({
+            "error": "内部エラーが発生しました",
+            "detail": str(e)
+        }), 500
 
 # --- トップページ：検索フォーム表示 ---
 @app.route("/")
@@ -74,7 +80,7 @@ def home():
     </html>
     ''', 200
 
-# --- Render対応ポート設定 ---
+# --- Render用ポート設定 ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
