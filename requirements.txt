@@ -1,4 +1,5 @@
 flask
 faiss-cpu
-sentence-transformers
-gunicorn
+openai
+python-dotenv
+numpy
