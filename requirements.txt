@@ -3,3 +3,4 @@ faiss-cpu
 openai>=1.2.0
 python-dotenv
 numpy
+gunicorn   
