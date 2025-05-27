@@ -1,5 +1,5 @@
-openai>=1.2.0
 flask
 faiss-cpu
-numpy
+openai>=1.2.0
 python-dotenv
+numpy
